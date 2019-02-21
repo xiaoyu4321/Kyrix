@@ -211,6 +211,8 @@ function RefreshDynamicLayers(viewId, viewportX, viewportY) {
         });
     }
     else     // hardcode: highlighting the current point
-    if (viewId == 0 && param.labelingMode == "list")
+    
+    // new mode - should always highlight
+    // if (viewId == 0 && param.labelingMode == "list")
         highlightPoint();
 };

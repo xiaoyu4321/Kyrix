@@ -42,23 +42,40 @@ $(function () {
 					console.log("Label Failed");
 				}
 			});
-			if (param.labelingMode == "list")
-				displayNext();
+            
+            // determine whether to stay or move to next
+            var curr_label=globalVar.labelList[globalVar.listPos];
+            if (curr_label != getIdFromRow()){
+                globalVar.listPos --;
+            
+            }
+                           
+			param.labelingMode = "list";
+                displayNext();
+
 		};
 		var backspaceEdit = function () {
 
             
-            // funky logic - return list index then issue POST
-            var res=displayPrev();
+
 			
-            if (param.labelingMode == "free" || res >= 0){
+            
+            //if (param.labelingMode == "free" || res >= 0){
+            // use global list to move positions
+            
+            if (globalVar.listPos > 0){
+            
+            // get
+            var prev_recordid=globalVar.labelList[globalVar.listPos-1];
+            
+            var res=displayPrev();
             
             var passcode = $("input[name=passcode]").val();
 			$.ajax({
 				type: "POST",
 				url: "backspace",
 				data: {
-					"item": "",
+					"item": prev_recordid,
 					"labeler": passcode,
 					"label": ""
 				},
@@ -69,7 +86,11 @@ $(function () {
 				}
 			});
             
-            };
+            
+            
+            }
+            //};
+ 
 
 		};        
         

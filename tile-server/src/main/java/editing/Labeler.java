@@ -51,10 +51,8 @@ public class Labeler {
         Statement stmt = DbConnector.getStmtByDbName(DATABASE_NAME);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        //String sql = String.format("select * from %s where doctorname = \'%s\' order by \"timestamp\" desc limit 1 ", table, labeler);
-        String sql = String.format("delete from %s where doctorname = \'%s\' and timestamp in (select timestamp from neweeglabels where doctorname = \'%s\' order by timestamp desc limit 1)", table, labeler, labeler);
-        
-        //String sql = String.format("INSERT INTO %s VALUES (\'%s\', \'%s\', \'%s\', \'%s\');", table, item, labeler, label, timestamp);
+        //String sql = String.format("delete from %s where doctorname = \'%s\' and timestamp in (select timestamp from neweeglabels where doctorname = \'%s\' order by timestamp desc limit 1)", table, labeler, labeler);
+        String sql = String.format("delete from %s where doctorname = \'%s\' and timestamp in (select timestamp from neweeglabels where (doctorname = \'%s\' and recordid =\'%s\') order by timestamp desc limit 1)", table, labeler, labeler, item);
 
         // run query, add to response
         int updates = stmt.executeUpdate(sql);
