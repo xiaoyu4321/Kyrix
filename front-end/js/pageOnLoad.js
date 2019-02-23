@@ -64,7 +64,7 @@ function setupLayerLayouts(viewId) {
 
     // hardcoding: keyboard events
     if (globalVarDict.curCanvas.id == "eeg") {
-        globalVarDict.eegMagnitude = 1;
+        globalVarDict.eegMagnitude = 3;
         globalVarDict.montage = 1;
         d3.select("body")
             .on("keydown", function () {

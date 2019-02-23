@@ -206,7 +206,12 @@ var eegXAxes = function (cWidth, cHeight, predicates) {
         .tickSize(-cHeight)
         .ticks(d3.timeSecond.filter(function (d) {return (d.getSeconds() - startDate.getSeconds()) % 2 == 0;}))
         .tickFormat(d3.timeFormat("%H:%M:%S"));
-    axes.push({"dim": "x", "scale": x, "axis": xAxis, "translate": [0, 0]});
+    var additionalTick = d3.axisTop()
+        .tickSize(-cHeight)
+        .ticks(d3.timeSecond.filter(function (d) {return (Math.abs(d.getSeconds() - startDate.getSeconds())) % 2 == 1;}))
+        .tickFormat("");
+    axes.push({"dim" : "x", "scale" : x, "axis" : xAxis, "translate": [0, 0]});
+    axes.push({"dim" : "x", "scale" : x, "axis" : additionalTick, "translate" : [0, 0]});
 
     return axes;
 };
