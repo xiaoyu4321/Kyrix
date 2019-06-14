@@ -95,7 +95,6 @@ public class CanvasRequestHandler implements HttpHandler {
         respMap.put("canvas", c);
         respMap.put("staticData", BoxandData.getDictionaryFromData(staticData, c));
         String response = gson.toJson(respMap);
-System.out.println("send response back");
         // send the response back
         Server.sendResponse(httpExchange, HttpsURLConnection.HTTP_OK, response);
     }
@@ -132,8 +131,10 @@ System.out.println("in get static data");
         rc.parseAndEval("result <- get_associations_for_phenotype_tab(bb, variants_namespace = variants_namespace, association_namespace = namespace, association_set = association_set, phenotypes = pheno, additional_variant_field_names = REGION_TAB_ADDITIONAL_VARIANT_FIELD_NAME)");
 //transforming xpos
         rc.eval("result$xpos <- result$pos");
-System.out.println("get result");
+System.out.println("Getting associations for phenotype tab...");
         rc.eval("for (chrom in chroms_all_but_first[chroms_all_but_first %in% PHEGE_CONFIG$CHROMOSOME_SELECTION]) result$xpos[result$chrom == chrom] <- (result$xpos[result$chrom == chrom] + sum(chromosome_lengths[1:chrom - 1]))");
+System.out.println("data returned in " + (System.currentTimeMillis() - start) / 1000.0 + "s.");
+        long st = System.currentTimeMillis();
         RList x = rc.eval("result").asList();
         String[] keys = x.keys();
         ArrayList<ArrayList<String>> result = new ArrayList<>();
@@ -147,7 +148,7 @@ System.out.println("get result");
         }
 rc.close();
         data.add(result);
-System.out.println("data returned in " + (System.currentTimeMillis() - start) / 1000.0 + "s.");
+System.out.println("transform R to Java in  " + (System.currentTimeMillis() - st) / 1000.0 + "s.");
         }
         return data;
     }
