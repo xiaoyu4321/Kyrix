@@ -33,12 +33,22 @@ System.out.println("in box and data");
                 HashMap<String, String> rowDict = new HashMap<>();
                 for (int k = 0; k < numFields; k ++)
                     rowDict.put(fields.get(k), rowArray.get(k));
+                if(c.getId().equals("region") && i == 1){
+                rowDict.put("cx", rowArray.get(1));
+                rowDict.put("cy", rowArray.get(0));
+                rowDict.put("minx", rowArray.get(1));
+                rowDict.put("miny", rowArray.get(0));
+                rowDict.put("maxx", rowArray.get(2));
+                rowDict.put("maxy", rowArray.get(0));
+                }
+                else {
                 rowDict.put("cx", rowArray.get(numFields-1));
                 rowDict.put("cy", rowArray.get(5));
                 rowDict.put("minx", rowArray.get(numFields - 1));
                 rowDict.put("miny", rowArray.get(5));
                 rowDict.put("maxx", rowArray.get(numFields - 1));
                 rowDict.put("maxy", rowArray.get(5));
+                }
                 ret.get(i).add(rowDict);
             }
         }

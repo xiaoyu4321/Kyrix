@@ -5,6 +5,14 @@ var regionPlacement = {
     "height" : "con:2"
 };
 
+var genePlacement = {
+    "centroid_x" : "col:start",
+    "centroid_y" : "con:450",
+    "width" : "con:1000",
+    "height" : "con:10"
+};
+
 module.exports = {
-    regionPlacement : regionPlacement
+    regionPlacement : regionPlacement,
+    genePlacement : genePlacement
 };

@@ -57,12 +57,12 @@ var regionAxes = function (args) {
         .domain([0, 2.5e8])
         .range([0, args.canvasW]);
     var xAxis = d3.axisBottom().ticks(5);
-    axes.push({"dim" : "x", "scale" : x, "axis" : xAxis, "translate" : [0, 500]});
+    axes.push({"dim" : "x", "scale" : x, "axis" : xAxis, "translate" : [0, args.canvasH - 100]});
 
     //y
     var y = d3.scaleLinear()
         .domain([0, 10])
-        .range([args.canvasH, 0]);
+        .range([args.canvasH - 100, 0]);
     var yAxis = d3.axisLeft().ticks(7);
     axes.push({"dim" : "y", "scale" : y, "axis" : yAxis, "translate" : [0, 0]});
 
@@ -70,23 +70,86 @@ var regionAxes = function (args) {
 
 };
 
+var geneRendering = function (svg, data, args){
+    g = svg.append("g");
+    g.selectAll("bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .style("fill", "steelblue")
+        .attr("x", function(d) { return d3.scaleLinear().domain([0, 2.5e8]).range([0, args.canvasW])(d.start);})
+        .attr("width", function(d) {return d3.scaleLinear().domain([0, 2.5e8]).range([0, args.canvasW])(d.end - d.start);})
+        .attr("y", "420")
+        .attr("height", "10")
+        .attr("transform", function(d, i){return "translate(0," + (i*10) + ")"});
+
+    g.selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .text(function(d) {return d.name;})
+        .attr("text-anchor", "middle")
+        .attr("x", function(d) { return d3.scaleLinear().domain([0, 2.5e8]).range([0, args.canvasW])(d.start);})
+        .style("font-size", "10")
+        .style("font-weight", "bold")
+        .attr("y", "430")
+        .attr("transform", function(d, i){return "translate(0," + (i*10) + ")"});
+      
+
+};
+
 var regionRendering = function (svg, data, args) {
     g = svg.append("g");
-    console.log(data); 
     g.selectAll("circle")
         .data(data)
         .enter()
         .append("circle")
         .attr("cx", function (d) {return d3.scaleLinear().domain([0, 2.5e8]).range([0, args.canvasW])(d.pos)})
+        .attr("cy", function (d) {return d3.scaleLinear().domain([0, 10]).range([args.canvasH - 100, 0])(d.log10pvalue)})
+        .attr("r", 2)
+        .attr("fill", "#145bce");
+}
+
+var variantRendering = function (svg, data, args) {
+
+    g = svg.append("g");
+    g.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) {return d3.scaleLinear().domain([-0.6, 0.6]).range([0, args.canvasW])(d.beta)})
         .attr("cy", function (d) {return d3.scaleLinear().domain([0, 10]).range([args.canvasH, 0])(d.log10pvalue)})
         .attr("r", 2)
         .attr("fill", "#145bce");
 }
 
+var variantAxes = function (args) {
+    var axes = [];
+
+    // x
+    var x = d3.scaleLinear()
+        .domain([-0.6, 0.6])
+        .range([0, args.canvasW]);
+    var xAxis = d3.axisBottom().ticks(5);
+    axes.push({"dim" : "x", "scale" : x, "axis" : xAxis, "translate" : [0, args.canvasH]});
+
+    //y
+    var y = d3.scaleLinear()
+        .domain([0, 10])
+        .range([args.canvasH, 0]);
+    var yAxis = d3.axisLeft().ticks(7);
+    axes.push({"dim" : "y", "scale" : y, "axis" : yAxis, "translate" : [args.canvasW/2, 0]});
+
+    return axes;
+
+}
 module.exports = {
     dotsRendering: dotsRendering,
     topAxes : topAxes,
     regionAxes : regionAxes,
-    regionRendering : regionRendering
+    regionRendering : regionRendering,
+    variantRendering : variantRendering,
+    variantAxes : variantAxes,
+    geneRendering : geneRendering
 };
 

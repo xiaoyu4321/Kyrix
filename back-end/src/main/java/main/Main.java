@@ -24,6 +24,7 @@ public class Main {
 
     private static Project project = null;
     public static String projectJSON = "";
+    private static RConnection rc;
 
     public static void main(String[] args) throws Exception {
 
@@ -46,24 +47,17 @@ public class Main {
         rc.eval("namespace <- \"RIVAS\"");
         rc.eval("association_set = \"RIVAS_ASSOC\"");
         rc.eval("variants_namespace = \"UK_BIOBANK\"");
-        rc.eval("bb <- get_scidb_biobank_connection(username = \"scidbadmin\", password = \"Paradigm4\")");
-        rc.assign("chromosome", "1");
-        rc.assign("start","11475435");
-        rc.assign("end", "11575435");
-        rc.eval("phenotypes <- get_phenotypes(bb,association_namespace = namespace,association_set_name = association_set)");
-        rc.eval("phenos <- phenotypes[as.integer(1), ]");
-        rc.eval("sub_field_ids <- subset(phenotypes, title %in% phenos$title)$sub_field_id");
-        rc.parseAndEval("REGION_TAB_ADDITIONAL_VARIANT_FIELD_NAME = c(\"genes\", \"consequence\")");
-        REXP a = rc.parseAndEval("try(result <- get_associations_for_region_tab(bb, variants_namespace = variants_namespace, association_namespace = namespace, association_set_name = association_set, sub_field_ids = sub_field_ids, chromosome = chromosome, start_position = start, end_position = end, additional_variant_field_names = REGION_TAB_ADDITIONAL_VARIANT_FIELD_NAME), silent=TRUE)");
+        REXP a = rc.eval("try(bb <- get_scidb_biobank_connection(username = \"scidbadmin\", password = \"Paradigm4\"),silent=TRUE)");
         if(a.inherits("try-error"))
               System.out.println("Error: "+ a.asString());
-System.out.println("get result");
-        rc.eval("result <- merge(result, phenotypes, by = \"sub_field_id\")");
-        rc.eval("result <- result[order(result$pos), ]");
-        rc.eval("result$title <- as.character(result$title)");
-        rc.eval("result$sub_field_id <- NULL");
-        rc.eval("result$pvalue_threshold <- NULL");
-        rc.eval("result$xpos <- result$pos");
+        rc.assign("chromosome", "12");
+            rc.eval("genes <- get_genes(bb, genes_namespace = variants_namespace)");
+        rc.eval("try(gene_info <- subset(genes, chrom == isolate(chromosome)), silent=TRUE)");
+        
+            rc.eval("gene_info <- subset(gene_info, end >= start)");
+            rc.eval("gene_info <- subset(gene_info, start <= end)");
+            rc.eval("result <- gene_info");
+
         RList x = rc.eval("result").asList();
         String[] keys = x.keys();
         ArrayList<ArrayList<String>> result = new ArrayList<>();
@@ -165,4 +159,21 @@ rc.close();
             e.printStackTrace();
         }
     }
+
+    private static void ScidbConn() throws Exception {
+        String filePath = "/home/scidb/biobank/phege/lib/data_access_helpers.R";
+        rc = new RConnection();
+        rc.assign("filepath", filePath);
+        rc.eval("source(filepath)");
+        rc.eval("namespace <- \"RIVAS\"");
+        rc.eval("association_set = \"RIVAS_ASSOC\"");
+        rc.eval("variants_namespace = \"UK_BIOBANK\"");
+        REXP a = rc.eval("try(bb <- get_scidb_biobank_connection(username = \"scidbadmin\", password = \"Paradigm4\"),silent=TRUE)");
+        if(a.inherits("try-error"))
+              System.out.println("Error: "+ a.asString());
+    }
+    
+    public static RConnection getScidbConn(){
+        return rc;
+    } 
 }

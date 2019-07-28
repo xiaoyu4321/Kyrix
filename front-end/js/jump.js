@@ -30,7 +30,9 @@ function preJump(viewId) {
     // use transition to remove axes, static trims & popovers
     d3.select(viewClass + ".axesg").transition()
         .duration(param.axesOutDuration)
-        .style("opacity", 0);
+        .style("opacity", 0)
+        .selectAll("*")
+        .remove();
     removePopoversSmooth(viewId);
 
     // change .mainsvg to .oldmainsvg, and .layerg to .oldlayerg
@@ -140,7 +142,7 @@ function semanticZoom(viewId, jump, predArray, newVpX, newVpY, tuple) {
     gvd.initialViewportX = newVpX;
     gvd.initialViewportY = newVpY;
 
-    // prefetch canvas object by sending an async request to server
+/*    // prefetch canvas object by sending an async request to server
     var postData = "id=" + gvd.curCanvasId;
     for (var i = 0; i < gvd.predicates.length; i ++)
         postData += "&predicate" + i + "=" + getSqlPredicate(gvd.predicates[i]);
@@ -160,7 +162,7 @@ function semanticZoom(viewId, jump, predArray, newVpX, newVpY, tuple) {
             async : true
         });
     }
-
+*/
     // disable stuff before animation
     preJump(viewId);
 
@@ -177,7 +179,7 @@ function semanticZoom(viewId, jump, predArray, newVpX, newVpY, tuple) {
     var tupleWidth = +tuple.maxx - tuple.minx;
     var tupleHeight = +tuple.maxy - tuple.miny;
     var minx, maxx, miny, maxy;
-    if (tupleWidth == 0 || tupleHeight == 0) {  // check when placement func does not exist
+    if (tupleWidth == 0 || isNaN(tupleWidth) || tupleHeight == 0 || isNaN(tupleHeight)) {  // check when placement func does not exist
         minx = gvd.curCanvas.w;
         miny = gvd.curCanvas.h;
         maxx = maxy = 0;

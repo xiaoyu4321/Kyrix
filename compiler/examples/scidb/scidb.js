@@ -33,8 +33,26 @@ var regionLayer = new Layer(transforms.regionTransform, false);
 regionCanvas.addLayer(regionLayer);
 regionLayer.addRenderingFunc(renderers.regionRendering);
 regionLayer.addPlacement(placements.regionPlacement);
+
+// gene layer
+var geneLayer = new Layer(transforms.geneTransform, false);
+regionCanvas.addLayer(geneLayer);
+geneLayer.addRenderingFunc(renderers.geneRendering);
+geneLayer.addPlacement(placements.genePlacement);
+
 // axis layer
 regionCanvas.addAxes(renderers.regionAxes);
+
+// ================= variant tab ==============
+var variantWidth = 1000, variantHeight = 500;
+var variantCanvas = new Canvas("variant", variantWidth, variantHeight);
+p.addCanvas(variantCanvas);
+
+var variantLayer = new Layer(transforms.variantTransform, true);
+variantCanvas.addLayer(variantLayer);
+variantLayer.addRenderingFunc(renderers.variantRendering);
+// axis layer
+variantCanvas.addAxes(renderers.variantAxes);
 
 // ================== Views ===================
 var view = new View("dotview", 0, 0, 1000, 500);
@@ -62,7 +80,50 @@ var jumpName = function (row) {
     return row.chrom + ":" + row.pos;
 };
 
-p.addJump(new Jump(topCanvas, regionCanvas, "geometric_semantic_zoom", {selector : selector, viewport : newViewport, predicates : newPredicate, name : jumpName}));
+p.addJump(new Jump(topCanvas, regionCanvas, "semantic_zoom", {selector : selector, viewport : newViewport, predicates : newPredicate, name : jumpName}));
+
+// ================= region -> variant =========
+var selector = function () {
+    return true;
+};
+
+var newViewport = function (row) {
+    return {"constant" : [0 ,0]};
+};
+
+var newPredicate = function (row) {
+    var pred = {"AND" : [
+               { "==" : ["chrom", row.chrom]},
+               { "==" : ["pos", row.pos]},
+               ]};
+    return {"layer0" : pred};
+};
+
+var jumpName = function (row) {
+    return row.chrom + ":" + row.pos;
+};
+
+p.addJump(new Jump(regionCanvas, variantCanvas, "semantic_zoom", {selector : selector, viewport : newViewport, predicates : newPredicate, name : jumpName}));
+
+// ================ variant -> phenotype =========
+var selector = function () {
+    return true;
+};
+
+var newViewport = function (row) {
+    return {"constant" : [0 ,0]};
+};
+
+var newPredicate = function (row) {
+    var pred =  { "==" : ["id", row.sub_field_id]};
+    return {"layer0" : pred};
+};
+
+var jumpName = function (row) {
+    return row.title + ":" + row.description;
+};
+
+p.addJump(new Jump(variantCanvas,topCanvas, "semantic_zoom", {selector : selector, viewport : newViewport, predicates : newPredicate, name : jumpName}));
 
 // save to db
 p.saveProject();
